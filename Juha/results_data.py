@@ -5,9 +5,9 @@
 # LIST-DICT-DB
 #
 import json
-from createanyclass import createclassinstance as cci
-from dictionaries import _dictionaries_
-#
+from createanyclass import create_class_instance 
+from dictionaries import dictionaries as cci
+from list_dict_DB import list_dict_DB
 #
 # Singleton class creates dict_db class if no instancies are running 
 class Singleton(type):
@@ -19,9 +19,11 @@ class Singleton(type):
     #
 #    
 class dict_db(metaclass=Singleton):
-    def __init__(self, initbal=0):
-        self.balance = initbal
-       
+    def __init__(self):
+        pass
+    
+    # Nice to know one way to build dictionary filter with simple sql like (not sql) syntax 
+    # like "select * from items where first = 'Matti'"  
     def get_words(self):
         #
         # Should be build dynamically to get tbl/item and column/item[]
@@ -60,12 +62,30 @@ class dict_db(metaclass=Singleton):
     def __main__(self):
         """[class main function]
         """
-        print("****** to sql frame ********")
-        sql_string = """select * from items where role = 'guitar'"""
-        sql_clause = sql_string.split()
+        #print("****** to sql frame ********")
+        #-----------------1st-way------------------------
+        # 1st way is sql like fech of data 
+        sql_string = "select * from items where role = 'guitar'"
+        sql_clause = sql_string.split() # to list
         words = self.get_words()
-        self.sql_to_db_frame(sql_clause, words)
-        
+        #print("Search with sql like string")
+        search1 = self.sql_to_db_frame(sql_clause, words)
+        print(search1)
+        #-----------------2nd-way------------------------
+        # 2nd way is search string fetch of data
+        #print("Search with [] string")
+        dict_name = 'items' # dictionary name
+        query_string = "[item for item in items if item['role']=='guitar']" # Query to get data
+        search2 = self.get_dictionary_data(query_string,dict_name)
+        print(search2)
+
+    #
+    def get_dictionary_data(self,query_string,dict_name):
+        #print('cci.get_dict_' + dict_name + '(cci)')
+        items = eval('cci.get_dict_' + dict_name + '(cci)')
+        #print(query_string)
+        return eval(query_string)
+    
     #
     # help function to create DataFrame search Strings
     def sql_to_db_frame(self,sql_clause:str,words:list):
@@ -75,40 +95,36 @@ class dict_db(metaclass=Singleton):
             sql_clause (str): [description]
         """
         #
-        list_wheres = []
-        rpl1="item['"
-        rpl2="']"
-        left="["
-        right="]"
+        items = cci.get_dict_items(cci)
+        list_wheres = [] # list of where clause items like (column_pc = 'computer')
+        rplc1="item['"
+        rplc2="']"
         for index, elem in enumerate(sql_clause):
-            if elem == '=':
+            if elem == '=': # check for equal(=) sign and left is key and right is value
                 if (index+1 < len(sql_clause) and index - 1 >= 0):
-                    #Check index bounds
-                    prev_el = str(sql_clause[index-1])
-                    prev_el = rpl1 + prev_el +rpl2
-                    curr_el = str(elem)+str(elem)
-                    next_el = str(sql_clause[index+1])
+                    prev_el = str(sql_clause[index-1]) # previous in list
+                    prev_el = rplc1 + prev_el +rplc2 # concatenate to right form with brackets
+                    curr_el = str(elem)+str(elem) # center or current in list (here is =)
+                    next_el = str(sql_clause[index+1]) # next in list
 
-                    wheres = prev_el + curr_el + next_el
-                    list_wheres.append(wheres)
+                    wheres = prev_el + curr_el + next_el # current where clause 
+                    list_wheres.append(wheres) # current where clause added to list
         #
-        print("sql_clause length : ",str(len(sql_clause)))
-        print("words length : ",str(len(words)))
         tmp_str = ""
         i=0
         for each_word in sql_clause:
             for word in words:
                 if each_word.lower() == list(word.keys())[0].lower():
-                    print(each_word.lower(),' = ',list(word.keys())[0].lower())
                     tmp_str = tmp_str + list(word.values())[0].lower()
                 else:
                     pass
-        list_wheres = "".join(list_wheres) # to string
-        #print(left + tmp_str + list_wheres + right)
+        list_wheres = "".join(list_wheres) # join list to string
+        left="["
+        right="]"
         search1 = eval(left + tmp_str + list_wheres + right)
-        #print(search1)
+        return search1
     #
-    
+    #
     # DB_1 = obj_list[0]
     # DB = list_dict_DB(items1) # Will index them all
     # Q = DB.Qobj() 
@@ -140,7 +156,7 @@ class dict_db(metaclass=Singleton):
     
             
 if __name__ == "__main__":
-    print("*******Start********")
+    #print("*******Start********")
     ddb = dict_db(list([])) # create dict_db runtime object
     # For safety reasons may be better to leave main out !!!
     # For testing it is helpfull
