@@ -26,8 +26,7 @@ class dict_db(metaclass=Singleton):
         self.DB = DBI
         self.db_json = db_json
         #self.initialize(DB)
-    
-    
+        
     def set_list_dict_db(self,value:object):
         """[Set the dictionary instance from dictionary class]
 
@@ -60,16 +59,22 @@ class dict_db(metaclass=Singleton):
     #    set_list_dict_db(self,DBI)
     #
     #
+    
     # Nice to know one way to build dictionary filter with simple sql like (not sql) syntax 
     # like "select * from items where first = 'Matti'"  
     def get_words(self):
         #
         # Should be build dynamically to get tbl/item and column/item[]
         words = []
+        " ToDO: items is hard coded should be read from sql clause"
         words = [{'select' : 'item for item '},
                 {'from' : 'in '},
                 {'items' : 'items '},
-                {'where' : 'if '}]
+                {'where' : 'if '},
+                {'=>':'=>'},
+                {'<=':'<='},
+                {'not':'!='},
+                {'<>':'<>'}]
         
         return words
     
@@ -184,8 +189,8 @@ class dict_db(metaclass=Singleton):
                     pass
                 
         list_wheres = "".join(list_wheres) # join list to string
-        left="["
-        right="]"
+        left="[" # python list syntax needs brackets = []
+        right="]" # other solution maybe casting to list list(tmp_str + list_wheres)
         search1 = eval(left + tmp_str + list_wheres + right)
         return search1
     
@@ -206,15 +211,19 @@ class dict_db(metaclass=Singleton):
     # Q = DB.Qobj(DB) # Instantiate it with the DB. DB.Q() will also work
     result_0 = DB.query( (DB.Q().role =='guitar') )
     print(result_0)
+    print("********************************")
     ##DB.query( (Q.last != 'Meikäläinen') )
     ##DB. DB.Q()
     ##Q = DB.Qobj(DB) 
     result_1 = DB.query( (DB.Q().last == 'Meikäläinen') )
     print(result_1)
+    print("********************************")
     result_2 = DB.query( (DB.Q().first != 'Minna') & (DB.Q().last == 'Meikäläinen'))
     print(result_2)
+    print("********************************")
     result_3 = DB( ~( (DB.Q().role == 'guitar') | (DB.Q().role == 'drums'))) # negate with ~
     print(result_3)
+    print("********************************")
 
     # Filter lookup if role quitar is true
     Q = DB.Qobj()
@@ -225,6 +234,8 @@ class dict_db(metaclass=Singleton):
     filt = lambda item: True if item['role'] == 'guitar' else False
     result_4 = DB.query(Q.filter(filt))
     print(result_4)
+    print("********************************")
+    print("__main__ function has 2 searches too. These are without list_dict_DB class")
     
     #Templates
     # search_1 = [item for item in items_x if item['First']=='Mikko' and item['Last']=='Meikäläinen']
