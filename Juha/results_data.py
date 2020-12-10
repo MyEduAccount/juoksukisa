@@ -70,11 +70,7 @@ class dict_db(metaclass=Singleton):
         words = [{'select' : 'item for item '},
                 {'from' : 'in '},
                 {'items' : 'items '},
-                {'where' : 'if '},
-                {'=>':'=>'},
-                {'<=':'<='},
-                {'not':'!='},
-                {'<>':'<>'}]
+                {'where' : 'if '}]
         
         return words
     
@@ -113,7 +109,7 @@ class dict_db(metaclass=Singleton):
     
     # text = 'Hello'
     # data=json.dumps(text) # to json
-    # text=json.loads(data) # to text
+    # text=json.loads(data) # to text 
     #       
     def json_dump(self,db_json_path):
         """[dump to file from DB ]
@@ -139,9 +135,11 @@ class dict_db(metaclass=Singleton):
         """[class main function]
         """
         #-----------------1st-way------------------------
+        print("*This next search is given with sql.*")
+        print("select * from items where role = 'guitar' and role = 'drums'")
         # 1st way is sql like fecth of data 
         dict_name = 'items' # dictionary name
-        sql_string = "select * from items where role = 'guitar'"
+        sql_string = "select * from items where role = 'guitar' or role = 'drums'"
         sql_clause = sql_string.split() # to list
         words = self.get_words()
         # print("Search with sql like string")
@@ -149,13 +147,16 @@ class dict_db(metaclass=Singleton):
         print(search1)
         
         #-----------------2nd-way------------------------
+        print("\n *This next search is given with dictionary search string.*")
+        print("[item for item in items if item['role']=='guitar' or item['role']=='drums']")
         # 2nd way is search string fetch of data
         # print("Search with [] string")
         # dict_name = 'items' # dictionary name
-        query_string = "[item for item in items if item['role']=='guitar']" # Query to get data
+        query_string = "[item for item in items if item['role']=='guitar' or item['role']=='drums']" # Query to get data
+                       #[item for item in items if item['First']=='Mikko' and item['Last']=='Meikäläinen']
         search2 = self.get_dictionary_data(query_string,dict_name)
         print(search2)
-    #
+    # 
     # help function to create DataFrame search Strings
     def sql_to_db_frame(self,sql_clause:str,words:list,dict_name:str):
         """[sql to db_frame string builder for dynamic queries of different dictionaries]
@@ -168,16 +169,38 @@ class dict_db(metaclass=Singleton):
         list_wheres = [] # list of where clause items like (column_pc = 'computer')
         rplc1="item['"
         rplc2="']"
+        #
+        # Where Clause operator elements in list of dictionaries
+        #
+        tmp_str=""
+        op_dict = {'and':'and','or':'or','=':'==','=>':'=>','<=':'<=','<>':'<>'} # operators dict for elements
+        llist = ["=","=>","<=","<>"] # operators list for 
         for index, elem in enumerate(sql_clause):
-            if elem == '=': # check for equal(=) sign and left is key and right is value
-                if (index+1 < len(sql_clause) and index - 1 >= 0):
-                    prev_el = str(sql_clause[index-1]) # previous in list
-                    prev_el = rplc1 + prev_el +rplc2 # concatenate to right form with brackets
-                    curr_el = str(elem)+str(elem) # center or current in list (here is =)
-                    next_el = str(sql_clause[index+1]) # next in list
+            #print("Current element is: ",elem)
+            for item in op_dict:
+                #print("Item is: ",item)
+                if item == elem:
+                    if elem.lower() == "and":
+                        tmp_str = " " + item + " " # maybe if 1st cheking here
+                        list_wheres.append(tmp_str)
+                        next
+                        
+                    if elem.lower() == "or":
+                        tmp_str = " " + item + " " # maybe if 1st cheking here
+                        list_wheres.append(tmp_str)
+                        next
+                        
+                    if elem in llist: #== "=": check for equal(=) sign and left is key and right is value
+                        if (index+1 < len(sql_clause) and index - 1 >= 0):
+                            prev_el = str(sql_clause[index-1]) # previous in list
+                            prev_el = rplc1 + prev_el +rplc2 # concatenate to right form with brackets
+                            curr_el = str(elem)+str(elem) # center or current in list (here is =)
+                            next_el = str(sql_clause[index+1]) # next in list
 
-                    wheres = prev_el + curr_el + next_el # current where clause 
-                    list_wheres.append(wheres) # current where clause added to list
+                            tmp_str = prev_el + curr_el + next_el # current where clause 
+                            list_wheres.append(tmp_str) # current where clause added to list
+                            next
+                            
         #
         tmp_str = ""
         i=0
@@ -187,10 +210,12 @@ class dict_db(metaclass=Singleton):
                     tmp_str = tmp_str + list(word.values())[0].lower()
                 else:
                     pass
-                
-        list_wheres = "".join(list_wheres) # join list to string
+        
+        #        
+        list_wheres = "".join(list_wheres) # join list to string - make string from list
         left="[" # python list syntax needs brackets = []
         right="]" # other solution maybe casting to list list(tmp_str + list_wheres)
+        print("Where clauses: ",list_wheres)
         search1 = eval(left + tmp_str + list_wheres + right)
         return search1
     
@@ -235,7 +260,7 @@ class dict_db(metaclass=Singleton):
     result_4 = DB.query(Q.filter(filt))
     print(result_4)
     print("********************************")
-    print("__main__ function has 2 searches too. These are without list_dict_DB class")
+    print("__main__ function has 2 searches too. These are without list_dict_DB class \n")
     
     #Templates
     # search_1 = [item for item in items_x if item['First']=='Mikko' and item['Last']=='Meikäläinen']
@@ -251,7 +276,7 @@ class dict_db(metaclass=Singleton):
     #           select * from    tbl  where first == George  and last == Harrison
     #print(search_1)
     
-            
+#            
 if __name__ == "__main__":
     #print("*******Start********")
     ddb = dict_db(list([])) # create dict_db runtime object
