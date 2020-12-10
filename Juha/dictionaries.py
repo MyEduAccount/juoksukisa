@@ -1,6 +1,5 @@
 #-*- coding: UTF8 -*-
 #
-#
 # Singleton class creates dict_db class if no instancies are running 
 class Singleton(type):
     _instances = {}
