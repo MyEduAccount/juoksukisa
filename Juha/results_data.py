@@ -171,10 +171,10 @@ class dict_db(metaclass=Singleton):
         rplc2="']"
         #
         # Where Clause operator elements in list of dictionaries
-        #
+        # Order by and group by could be added here but dictio9nary search syntax supports only join and smthng
         tmp_str=""
         op_dict = {'and':'and','or':'or','=':'==','=>':'=>','<=':'<=','<>':'<>'} # operators dict for elements
-        llist = ["=","=>","<=","<>"] # operators list for 
+        llist = ["=","=>","<=","<>","<",">"] # operators list to locate and separate where like x=y z<t and so on ...
         for index, elem in enumerate(sql_clause):
             #print("Current element is: ",elem)
             for item in op_dict:
