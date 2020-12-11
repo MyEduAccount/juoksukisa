@@ -9,7 +9,7 @@ const ModalComponent = ({ participant, show, setShow }) => {
           <Modal.Title>{participant.name}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>Ikä: {participant.age}</p>
+          <p>Ikä: 33 {participant.age}</p>
           <p>Aika: {participant.result}</p>
           <p>Matkan pituus: {participant.distance}</p>
         </Modal.Body>
