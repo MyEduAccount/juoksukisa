@@ -19,6 +19,30 @@ class dictionaries(metaclass=Singleton):
         self.dict_items2
            
     #
+    # Give dictionary names to merge - return is merged dictionary
+    # join in chain if more than one
+    def merge_two_dicts(x, y):
+        """Given two dictionaries, merge them into a new dict as a shallow copy."""
+        z = x.copy()
+        z.update(y)
+        return z
+    
+    def get_dict_results(self):
+        self.dict_results = [
+        {
+            'id' : 0, 
+            'name' : 'Kalle Järvinen',
+            'result' : '01:23:34',
+            'distance' : '10km' 
+        },
+        {
+            'id' : 1, 
+            'name' : 'Pentti Mielonen',
+            'result' : '02:11:04',
+            'distance' : '10km' 
+        }
+        ]
+
     def get_dict_items(self):
         self.dict_items = [
                 
